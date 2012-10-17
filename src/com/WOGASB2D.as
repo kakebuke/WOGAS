@@ -9,16 +9,20 @@ package com
 	import Box2D.Dynamics.b2FixtureDef;
 	import Box2D.Dynamics.b2World;
 	
+	import flash.display.Loader;
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import flash.geom.Point;
+	import flash.net.getClassByAlias;
 	import flash.utils.getTimer;
+	
+	import mx.core.mx_internal;
 
 	[SWF(width="1024", height="768", frameRate="60", backgroundColor="#FFFFFF")]
 	public class WOGASB2D extends Sprite
 	{
-		private const PIXELS_TO_METRE:int = 30;
+		private const RATIO:int = 30;
 		private const SWF_HALF_WIDTH:int = 512;
 		private const SWF_HEIGHT:int = 768;
 		
@@ -36,26 +40,38 @@ package com
 			throwingVec = new Vector.<Point>(2);
 			
 			var groundBodyDef:b2BodyDef= new b2BodyDef();
-			groundBodyDef.position.Set(SWF_HALF_WIDTH / PIXELS_TO_METRE, SWF_HEIGHT / PIXELS_TO_METRE - 20 / PIXELS_TO_METRE);
-			
-			var leftBorderBodyDef:b2BodyDef= new b2BodyDef();
-			leftBorderBodyDef.position.Set(SWF_HALF_WIDTH / PIXELS_TO_METRE, SWF_HEIGHT / PIXELS_TO_METRE - 20 / PIXELS_TO_METRE);
-			
-			var groundBody:b2Body = _world.CreateBody(groundBodyDef);
+			groundBodyDef.position.Set(SWF_HALF_WIDTH / RATIO, SWF_HEIGHT / RATIO - 20 / RATIO);
 			
 			var groundBox:b2PolygonShape = new b2PolygonShape();
-			groundBox.SetAsBox(SWF_HALF_WIDTH / PIXELS_TO_METRE, 20 / PIXELS_TO_METRE);
+			groundBox.SetAsBox(SWF_HALF_WIDTH / RATIO, 20 / RATIO);
 			
 			var groundFixtureDef:b2FixtureDef = new b2FixtureDef();
 			groundFixtureDef.shape = groundBox;
 			groundFixtureDef.density = 1;
 			groundFixtureDef.friction = 1;
 			groundFixtureDef.restitution = 0;
+			
+			var groundBody:b2Body = _world.CreateBody(groundBodyDef);
 			groundBody.CreateFixture(groundFixtureDef);
+			
+			var leftBorderBodyDef:b2BodyDef= new b2BodyDef();
+			leftBorderBodyDef.position.Set(10 / RATIO, (768 / 2) / RATIO);
+			var leftBody:b2Body = _world.CreateBody(leftBorderBodyDef);
+			var leftBorderBox:b2PolygonShape = new b2PolygonShape();
+			leftBorderBox.SetAsBox(10 / RATIO, (768 / 2) / RATIO);
+			groundFixtureDef.shape = leftBorderBox;
+			leftBody.CreateFixture(groundFixtureDef);
+			
+			leftBorderBodyDef.position.Set((1024 - 10) / RATIO, (768 / 2) / RATIO);
+			var rightBody:b2Body = _world.CreateBody(leftBorderBodyDef);
+			var rightBorderBox:b2PolygonShape = new b2PolygonShape();
+			rightBorderBox.SetAsBox(10 / RATIO, (768 / 2) / RATIO);
+			groundFixtureDef.shape = leftBorderBox;
+			rightBody.CreateFixture(groundFixtureDef);
 			
 			var bodyDef:b2BodyDef = new b2BodyDef();
 			bodyDef.type = b2Body.b2_dynamicBody;
-			bodyDef.position.Set(SWF_HALF_WIDTH/PIXELS_TO_METRE, 4);
+			bodyDef.position.Set(SWF_HALF_WIDTH/RATIO, 4);
 			bodyDef.angle = 180;
 			body = _world.CreateBody(bodyDef);
 			
@@ -74,7 +90,7 @@ package com
 			addChild(debugSprite);
 			var debugDraw:b2DebugDraw = new b2DebugDraw();
 			debugDraw.SetSprite(debugSprite);
-			debugDraw.SetDrawScale(PIXELS_TO_METRE);
+			debugDraw.SetDrawScale(RATIO);
 			debugDraw.SetLineThickness( 1.0);
 			debugDraw.SetAlpha(1);
 			debugDraw.SetFillAlpha(0.4);
@@ -85,13 +101,12 @@ package com
 			
 			stage.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
 			stage.addEventListener(MouseEvent.MOUSE_UP, onMouseUp);
-			
 		}
 		
 		protected function onMouseUp(event:MouseEvent):void
 		{
 			_dragging = false;
-			throwingVec[1] = new Point(mouseX / PIXELS_TO_METRE, mouseY / PIXELS_TO_METRE);
+			throwingVec[1] = new Point(mouseX / RATIO, mouseY / RATIO);
 			throwingTime = (getTimer()/1000) - throwingTime;
 			body.SetLinearVelocity(_getThrowingVector());
 			body.SetActive(true);
@@ -106,14 +121,14 @@ package com
 		protected function onMouseDown(event:MouseEvent):void
 		{
 			
-			var p:b2Vec2 = new b2Vec2(mouseX / PIXELS_TO_METRE, mouseY / PIXELS_TO_METRE);
+			var p:b2Vec2 = new b2Vec2(mouseX / RATIO, mouseY / RATIO);
 			if ( body.GetFixtureList().TestPoint(p) )
 			{
 				body.SetActive(false);
 				body.SetLinearVelocity(new b2Vec2(0,0));
 				body.SetAngularVelocity(0);
 				_dragging = true;
-				throwingVec[0] = new Point(mouseX / PIXELS_TO_METRE, mouseY / PIXELS_TO_METRE);
+				throwingVec[0] = new Point(mouseX / RATIO, mouseY / RATIO);
 				throwingTime = getTimer() / 1000;
 			}
 		}
@@ -129,14 +144,14 @@ package com
 			_world.DrawDebugData();
 			
 			if (_dragging) {
-				var p:b2Vec2 = new b2Vec2(mouseX / PIXELS_TO_METRE, mouseY / PIXELS_TO_METRE);
+				var p:b2Vec2 = new b2Vec2(mouseX / RATIO, mouseY / RATIO);
 				body.SetPosition(p);
-				var p2:Point = new Point(mouseX / PIXELS_TO_METRE, mouseY / PIXELS_TO_METRE);
-				if (throwingVec[0].x < 0 && p2.x > 0 || throwingVec[0].x > 0 && throwingVec[0].x < 0) {
+				var p2:Point = new Point(mouseX / RATIO, mouseY / RATIO);
+				if (throwingVec[0].x < 0 && p2.x > 0 || throwingVec[0].x > 0 && p2.x < 0) {
 					throwingVec[0] = p2;
 					throwingTime = getTimer() / 1000;
 				}
-				if (throwingVec[0].y < 0 && p2.y > 0 || throwingVec[0].y > 0 && throwingVec[0].y < 0) {
+				if (throwingVec[0].y < 0 && p2.y > 0 || throwingVec[0].y > 0 && p2.y < 0) {
 					throwingVec[0] = p2;
 					throwingTime = getTimer() / 1000;
 				}

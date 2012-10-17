@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<actionScriptProperties analytics="false" mainApplicationPath="com/WOGASB2D.as" projectUUID="f9352619-9524-467a-bfe4-30a715e8a12a" version="10">
+<actionScriptProperties analytics="false" mainApplicationPath="com/WOGASCAMERA.as" projectUUID="f9352619-9524-467a-bfe4-30a715e8a12a" version="10">
   <compiler additionalCompilerArguments="-locale en_US" autoRSLOrdering="true" copyDependentFiles="true" fteInMXComponents="false" generateAccessible="true" htmlExpressInstall="true" htmlGenerate="true" htmlHistoryManagement="true" htmlPlayerVersionCheck="true" includeNetmonSwc="false" outputFolderPath="bin-debug" removeUnusedRSL="true" sourceFolderPath="src" strict="true" targetPlayerVersion="0.0.0" useApolloConfig="false" useDebugRSLSwfs="true" verifyDigests="true" warn="true">
     <compilerSourcePath/>
     <libraryPath defaultLinkType="0">
@@ -35,7 +35,7 @@
     <sourceAttachmentPath/>
   </compiler>
   <applications>
-    <application path="com/WOGASB2D.as"/>
+    <application path="com/WOGASCAMERA.as"/>
   </applications>
   <modules/>
   <buildCSSFiles/>
